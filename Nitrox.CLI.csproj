@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(NitroxNetCoreVersion)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    <GenerateRequiresPreviewFeaturesAttribute>true</GenerateRequiresPreviewFeaturesAttribute>
+    
+    <!-- These should be set by the user, depending on what you want to build -->
+    <!-- TODO: move into a config or test by BuildTool output -->
+    <BuildSubnautica>True</BuildSubnautica>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NitroxModel\NitroxModel.csproj" />
+    <ProjectReference Include="..\NitroxServer\NitroxServer.csproj" />
+    <ProjectReference Condition="$(BuildSubnautica)==true" Include="..\NitroxServer-Subnautica\NitroxServer-Subnautica.csproj" />
+  </ItemGroup>
+
+  <Target Name="BuildSubnautica" AfterTargets="Build" Condition="$(BuildSubnautica)==True">
+      <ItemGroup>
+          <ProjectToBuildSN Include="..\NitroxModel\NitroxModel.csproj">
+              <AdditionalProperties>TargetFramework=net472</AdditionalProperties>
+          </ProjectToBuildSN>
+          <ProjectToBuildSN Include="..\NitroxModel-Subnautica\NitroxModel-Subnautica.csproj">
+
+          </ProjectToBuildSN>
+          <ProjectToBuildSN Include="..\NitroxClient\NitroxClient.csproj">
+
+          </ProjectToBuildSN>
+          <ProjectToBuildSN Include="..\NitroxPatcher\NitroxPatcher.csproj">
+
+          </ProjectToBuildSN>
+      </ItemGroup>
+      
+      <!-- Builds the Nitrox Clientside libraries for Subnautica -->
+      <!-- OutputPath | Sets the output path to lib -->
+      <!-- SatelliteResourceLanguages | Gets rid of useless localization folders in lib -->
+      <MSBuild
+          Projects="@(ProjectToBuildSN)"
+          Properties="OutputPath=$(TargetDir)\lib;SatelliteResourceLanguages=en">
+      </MSBuild>
+      
+      <ItemGroup>
+          <NitroxSubnauticaAssets Include="..\Nitrox.Assets.Subnautica\AssetBundles\**\*." />
+      </ItemGroup>
+      <ItemGroup>
+          <NitroxSubnauticaStaticDlls Include="..\Nitrox.Assets.Subnautica\**\*.dll" />
+      </ItemGroup>
+      <ItemGroup>
+          <NitroxSubnauticaLanguageFiles Include="..\Nitrox.Assets.Subnautica\LanguageFiles\*.json" />
+      </ItemGroup>
+      <Copy SourceFiles="@(NitroxSubnauticaAssets)" DestinationFolder="$(TargetDir)\AssetBundles\%(RecursiveDir)" />
+      <Copy SourceFiles="@(NitroxSubnauticaStaticDlls)" DestinationFolder="$(TargetDir)\lib\%(RecursiveDir)" />
+      <Copy SourceFiles="@(NitroxSubnauticaLanguageFiles)" DestinationFolder="$(TargetDir)\LanguageFiles\%(RecursiveDir)" />
+  </Target>
+
+</Project>
