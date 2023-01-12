@@ -28,15 +28,6 @@ public class GameRunCommand : NitroxCommand
     public override void CommandExecuted() {
         var skip_patching = GetOption<bool>("skip-patching");
         var game = GetArgument<GameName>("game");
-
-        var processes = Process.GetProcessesByName("steam");
-        if (processes.Length == 0) {
-            CommandError("Steam is not running or couldn't be found. Please launch steam and try again.");
-            return;
-        }
-
-        ProcessStartInfo startInfo = new ProcessStartInfo() { FileName = "/usr/bin/steam", Arguments = $"-applaunch {game.GameInfo.SteamAppId}", }; 
-        Process proc = new Process() { StartInfo = startInfo, };
-        proc.Start();
+        GameStarting.StartMultiplayerAsync(game.GameInfo);
     }
 }
