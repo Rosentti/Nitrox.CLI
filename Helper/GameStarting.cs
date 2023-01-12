@@ -13,9 +13,16 @@ using NitroxModel.Platforms.Store.Interfaces;
 namespace Nitrox.CLI.Helper;
 public static class GameStarting {
     private static NitroxEntryPatch nitroxEntryPatch;
-    public static async Task StartMultiplayerAsync(GameInfo game)
+    public static void StartMultiplayer(GameInfo game)
         {
-            if (string.IsNullOrWhiteSpace(NitroxUser.GamePath) || !Directory.Exists(NitroxUser.GamePath))
+            string gamepath = "";
+            if (!string.IsNullOrEmpty(NitroxUser.PreferredGamePath)) {
+                gamepath = NitroxUser.PreferredGamePath;
+                NitroxUser.GamePath = gamepath;
+            } else {
+                gamepath = NitroxUser.GamePath;
+            }
+            if (string.IsNullOrEmpty(gamepath))
             {
                 throw new Exception($"Location of {game.FullName} is unknown. ");
             }
@@ -28,7 +35,7 @@ public static class GameStarting {
 #if RELEASE
             if (Process.GetProcessesByName(game.Name).Length > 0)
             {
-                throw new Exception("An instance of Subnautica is already running");
+                throw new Exception($"An instance of {game.FullName} is already running");
             }
 #endif
 
@@ -38,7 +45,7 @@ public static class GameStarting {
             {
                 File.Copy(
                     Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "lib", initDllName),
-                    Path.Combine(NitroxUser.GamePath, "Subnautica_Data", "Managed", initDllName),
+                    Path.Combine(gamepath, $"{game.Name}_Data", "Managed", initDllName),
                     true
                 );
             }
@@ -54,7 +61,7 @@ public static class GameStarting {
                 {
                     nitroxEntryPatch.Remove();
                 }
-                nitroxEntryPatch = new NitroxEntryPatch(() => NitroxUser.GamePath);
+                nitroxEntryPatch = new NitroxEntryPatch(() => Path.Combine(gamepath, $"{game.Name}_Data"));
 
             if (nitroxEntryPatch == null)
             {
@@ -63,20 +70,19 @@ public static class GameStarting {
             nitroxEntryPatch.Remove();
             nitroxEntryPatch.Apply();
 
-            if (IsQModInstalled(NitroxUser.GamePath))
+            if (IsQModInstalled(gamepath))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Seems like QModManager is Installed");
                 Console.ResetColor();
             }
 
-            await StartGameAsync(game);
+            StartGame(game, gamepath);
         }
 
-        private static async Task StartGameAsync(GameInfo game)
+        private static void StartGame(GameInfo game, string gamePath)
         {
-            string subnauticaPath = NitroxUser.GamePath;
-            IGamePlatform platform = GamePlatforms.GetPlatformByGameDir(subnauticaPath);
+            IGamePlatform platform = GamePlatforms.GetPlatformByGameDir(gamePath);
             switch (platform.Platform) {
                 case NitroxModel.Discovery.Platform.STEAM:
                     var processes = Process.GetProcessesByName("steam");
@@ -90,7 +96,7 @@ public static class GameStarting {
                     Process proc = new Process() { StartInfo = startInfo, };
                     // we need to symlink the Nitrox folder in the wine prefixes appdata into a user folder
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-                        var protonPrefixPath = System.IO.Path.Combine(subnauticaPath, "..", "..", "compatdata", game.SteamAppId.ToString(), "pfx");
+                        var protonPrefixPath = System.IO.Path.Combine(gamePath, "..", "..", "compatdata", game.SteamAppId.ToString(), "pfx");
                         var appdataRoaming = System.IO.Path.Combine(protonPrefixPath, "drive_c", "users", "steamuser", "AppData", "Roaming");
                         var localShare = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                         var localShareNitrox = Path.Combine(localShare, "Nitrox");

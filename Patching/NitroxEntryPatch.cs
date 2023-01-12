@@ -24,7 +24,7 @@ internal sealed class NitroxEntryPatch
     private const string NITROX_EXECUTE_INSTRUCTION = "System.Void NitroxPatcher.Main::Execute()";
 
     private readonly Func<string> subnauticaBasePathFunc;
-    private string subnauticaManagedPath => Path.Combine(subnauticaBasePathFunc(), "Subnautica_Data", "Managed");
+    private string subnauticaManagedPath => Path.Combine(subnauticaBasePathFunc(), "Managed");
 
     public bool IsApplied => IsPatchApplied();
 

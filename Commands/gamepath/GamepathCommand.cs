@@ -15,7 +15,8 @@ public class GamepathCommand : NitroxCommand
     public override List<NitroxCommand> Subcommands => new List<NitroxCommand>()
     {
         new GamepathSetCommand(),
-        new GamepathGetCommand()
+        new GamepathGetCommand(),
+        new GamepathUnsetCommand()
     };
     public override bool? CategorizingCommand => true;
 

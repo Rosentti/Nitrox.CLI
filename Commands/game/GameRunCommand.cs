@@ -28,6 +28,6 @@ public class GameRunCommand : NitroxCommand
     public override void CommandExecuted() {
         var skip_patching = GetOption<bool>("skip-patching");
         var game = GetArgument<GameName>("game");
-        GameStarting.StartMultiplayerAsync(game.GameInfo);
+        GameStarting.StartMultiplayer(game.GameInfo);
     }
 }

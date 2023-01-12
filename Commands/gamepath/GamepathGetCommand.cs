@@ -19,21 +19,10 @@ public class GamepathGetCommand : NitroxCommand
     };
 
     public override void CommandExecuted() {
-        var game = GetArgument<string>("game");
-        switch (game) {
-            case "subnautica":
-            case "sn":
-                Console.WriteLine($"Preferred game path: {NitroxUser.PreferredGamePath}");
-                Console.WriteLine($"Actual (used) game path: {NitroxUser.GamePath}");
-                break;
-            case "subnauticabelowzero":
-            case "belowzero":
-            case "bz":
-                CommandError("Subnautica: Below Zero is not supported in Nitrox yet.");
-                break;
-            default:
-                CommandError($"I didn't understand {game}");
-                break;
-        }
+        var game = GetArgument<GameName>("game");
+        var preferredExists = !string.IsNullOrEmpty(NitroxUser.PreferredGamePath);
+        Console.WriteLine($"Preferred {(preferredExists ? "(used) " : "")}game path: {NitroxUser.PreferredGamePath}");
+        Console.WriteLine($"Discovered {(!preferredExists ? "(used) " : "")}game path: {NitroxUser.GamePath}");
+
     }
 }
