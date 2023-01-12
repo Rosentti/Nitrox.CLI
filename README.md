@@ -18,4 +18,4 @@ After these steps, Nitrox.CLI is ready to use. Just hit compile in your favourit
 ## Contibuting
 Feel free to contribute features you think would be useful, but keep in mind this project was made primarily with rapid prototyping in mind.
 
-This also means that you should *not* include this project in commits to Nitrox's main repo. 
+This also means that you should *not* include this project in commits to Nitrox's main repo. If you added this as a project to your favourite IDE or otherwise modified Nitrox.sln, make sure to not commit those changes either.
