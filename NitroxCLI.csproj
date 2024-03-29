@@ -25,17 +25,17 @@
 
   <Target Name="BuildSubnautica" AfterTargets="Build" Condition="$(BuildSubnautica)==True">
       <ItemGroup>
+          <ProjectToBuildSN Include="..\NitroxPatcher\NitroxPatcher.csproj">
+              
+          </ProjectToBuildSN>
           <ProjectToBuildSN Include="..\NitroxModel\NitroxModel.csproj">
-              <AdditionalProperties>TargetFramework=net472</AdditionalProperties>
+              
           </ProjectToBuildSN>
           <ProjectToBuildSN Include="..\NitroxModel-Subnautica\NitroxModel-Subnautica.csproj">
-
+              
           </ProjectToBuildSN>
           <ProjectToBuildSN Include="..\NitroxClient\NitroxClient.csproj">
-
-          </ProjectToBuildSN>
-          <ProjectToBuildSN Include="..\NitroxPatcher\NitroxPatcher.csproj">
-
+              
           </ProjectToBuildSN>
       </ItemGroup>
       
@@ -44,21 +44,27 @@
       <!-- SatelliteResourceLanguages | Gets rid of useless localization folders in lib -->
       <MSBuild
           Projects="@(ProjectToBuildSN)"
-          Properties="OutputPath=$(TargetDir)\lib;SatelliteResourceLanguages=en">
+          Targets="Restore;Build"
+          Properties="OutputPath=$(TargetDir)\lib;SatelliteResourceLanguages=en;TargetFramework=net472">
       </MSBuild>
       
       <ItemGroup>
-          <NitroxSubnauticaAssets Include="..\Nitrox.Assets.Subnautica\AssetBundles\**\*." />
-      </ItemGroup>
-      <ItemGroup>
-          <NitroxSubnauticaStaticDlls Include="..\Nitrox.Assets.Subnautica\**\*.dll" />
-      </ItemGroup>
-      <ItemGroup>
-          <NitroxSubnauticaLanguageFiles Include="..\Nitrox.Assets.Subnautica\LanguageFiles\*.json" />
-      </ItemGroup>
-      <Copy SourceFiles="@(NitroxSubnauticaAssets)" DestinationFolder="$(TargetDir)\AssetBundles\%(RecursiveDir)" />
-      <Copy SourceFiles="@(NitroxSubnauticaStaticDlls)" DestinationFolder="$(TargetDir)\lib\%(RecursiveDir)" />
-      <Copy SourceFiles="@(NitroxSubnauticaLanguageFiles)" DestinationFolder="$(TargetDir)\LanguageFiles\%(RecursiveDir)" />
+            <NitroxSubnauticaAssets Include="..\Nitrox.Assets.Subnautica\**\*." />
+        </ItemGroup>
+        <ItemGroup>
+            <NitroxSubnauticaStaticDlls Include="..\Nitrox.Assets.Subnautica\**\*.dll" />
+        </ItemGroup>
+        <ItemGroup>
+            <NitroxSubnauticaLanguageFiles Include="..\Nitrox.Assets.Subnautica\LanguageFiles\*.json" />
+        </ItemGroup>
+        <ItemGroup>
+            <NitroxSubnauticaResources Include="..\Nitrox.Assets.Subnautica\Resources\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(NitroxSubnauticaAssets)" DestinationFolder="$(TargetDir)\%(RecursiveDir)" />
+        <Copy SourceFiles="@(NitroxSubnauticaStaticDlls)" DestinationFolder="$(TargetDir)\lib\%(RecursiveDir)" />
+        <Copy SourceFiles="@(NitroxSubnauticaLanguageFiles)" DestinationFolder="$(TargetDir)\LanguageFiles\%(RecursiveDir)" />
+        <Copy SourceFiles="@(NitroxSubnauticaResources)" DestinationFolder="$(TargetDir)\Resources\%(RecursiveDir)" />
+      
   </Target>
 
 </Project>

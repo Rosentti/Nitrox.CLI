@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.Text.Json;
 using Nitrox.CLI.Helper;
 using NitroxModel;
 using NitroxModel.Helper;
@@ -20,7 +19,7 @@ public class GamepathUnsetCommand : NitroxCommand
 
     public override void CommandExecuted() {
         var game = GetArgument<GameName>("game");
-        NitroxUser.PreferredGamePath = null;
+        GamePathUtil.SetPreferredGamePath(game.GameInfo, null);
         Console.WriteLine($"Unset {game.GameInfo.FullName}'s path.");
     }
 }

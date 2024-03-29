@@ -12,16 +12,30 @@ using NitroxModel.Platforms.Store.Interfaces;
 
 namespace Nitrox.CLI.Helper;
 public static class GameStarting {
-    private static NitroxEntryPatch nitroxEntryPatch;
+    private static NitroxEntryPatch? nitroxEntryPatch;
     public static void StartMultiplayer(GameInfo game)
         {
             string gamepath = "";
-            if (!string.IsNullOrEmpty(NitroxUser.PreferredGamePath)) {
-                gamepath = NitroxUser.PreferredGamePath;
-                NitroxUser.GamePath = gamepath;
+
+            string? preferred = GamePathUtil.GetPreferredGamePath(game);
+
+            if (!string.IsNullOrEmpty(preferred)) {
+                gamepath = preferred;
+                if (game.Name == "SubnauticaZero") {
+                    NitroxUser.GamePath_BZ = gamepath;
+                } else {
+                    NitroxUser.GamePath = gamepath;
+                }
             } else {
-                gamepath = NitroxUser.GamePath;
+                if (game.Name == "SubnauticaZero") {
+                    gamepath = NitroxUser.GamePath_BZ;
+                } else {
+                    gamepath = NitroxUser.GamePath;
+                }
             }
+
+            
+            
             if (string.IsNullOrEmpty(gamepath))
             {
                 throw new Exception($"Location of {game.FullName} is unknown. ");
@@ -84,7 +98,7 @@ public static class GameStarting {
         {
             IGamePlatform platform = GamePlatforms.GetPlatformByGameDir(gamePath);
             switch (platform.Platform) {
-                case NitroxModel.Discovery.Platform.STEAM:
+                case NitroxModel.Discovery.Models.Platform.STEAM:
                     var processes = Process.GetProcessesByName("steam");
                     if (processes.Length == 0) {
                         throw new Exception("Steam is not running or couldn't be found. Please launch steam and try again.");

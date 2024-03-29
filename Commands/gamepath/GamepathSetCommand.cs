@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.Text.Json;
 using Nitrox.CLI.Helper;
 using NitroxModel;
 using NitroxModel.Helper;
@@ -23,7 +22,7 @@ public class GamepathSetCommand : NitroxCommand
         var game = GetArgument<GameName>("game");
         var path = GetArgument<string>("path");
         NitroxUser.GamePath = path;
-        NitroxUser.PreferredGamePath = path;
+        GamePathUtil.SetPreferredGamePath(game.GameInfo, path);
         Console.WriteLine($"Set {game.GameInfo.FullName}'s path to {path}");
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.Text.Json;
 using Nitrox.CLI.Helper;
 using NitroxModel;
 using NitroxModel.Helper;
@@ -20,9 +19,14 @@ public class GamepathGetCommand : NitroxCommand
 
     public override void CommandExecuted() {
         var game = GetArgument<GameName>("game");
-        var preferredExists = !string.IsNullOrEmpty(NitroxUser.PreferredGamePath);
-        Console.WriteLine($"Preferred {(preferredExists ? "(used) " : "")}game path: {NitroxUser.PreferredGamePath}");
-        Console.WriteLine($"Discovered {(!preferredExists ? "(used) " : "")}game path: {NitroxUser.GamePath}");
+        string? preferred = GamePathUtil.GetPreferredGamePath(game.GameInfo);
+        var preferredExists = !string.IsNullOrEmpty(preferred);
+        Console.WriteLine($"Preferred {(preferredExists ? "(used) " : "")}game path: {preferred}");
 
+        if (game.Name == "SubnauticaZero") {
+            Console.WriteLine($"Discovered {(!preferredExists ? "(used) " : "")}game path: {NitroxUser.GamePath_BZ}");
+        } else {
+            Console.WriteLine($"Discovered {(!preferredExists ? "(used) " : "")}game path: {NitroxUser.GamePath}");
+        }
     }
 }
