@@ -45,7 +45,7 @@
       <MSBuild
           Projects="@(ProjectToBuildSN)"
           Targets="Restore;Build"
-          Properties="OutputPath=$(TargetDir)\lib;SatelliteResourceLanguages=en;TargetFramework=net472">
+          Properties="OutputPath=$(TargetDir)\lib;SatelliteResourceLanguages=en;TargetFramework=net472;GameReference=Subnautica">
       </MSBuild>
       
       <ItemGroup>
