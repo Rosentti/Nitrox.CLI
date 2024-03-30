@@ -12,7 +12,6 @@ namespace Nitrox.CLI.Patching;
 internal sealed class NitroxEntryPatch
 {
     public const string GAME_ASSEMBLY_NAME = "Assembly-CSharp.dll";
-    public const string NITROX_ASSEMBLY_NAME = "NitroxPatcher.dll";
     public const string GAME_ASSEMBLY_MODIFIED_NAME = "Assembly-CSharp-Nitrox.dll";
 
     private const string NITROX_ENTRY_TYPE_NAME = "Main";
@@ -21,22 +20,30 @@ internal sealed class NitroxEntryPatch
     private const string GAME_INPUT_TYPE_NAME = "GameInput";
     private const string GAME_INPUT_METHOD_NAME = "Awake";
 
-    private const string NITROX_EXECUTE_INSTRUCTION = "System.Void NitroxPatcher.Main::Execute()";
-
     private readonly Func<string> subnauticaBasePathFunc;
     private string subnauticaManagedPath => Path.Combine(subnauticaBasePathFunc(), "Managed");
 
-    public bool IsApplied => IsPatchApplied();
+    public bool IsApplied { get; private set; } = false;
 
-    public NitroxEntryPatch(Func<string> subnauticaBasePathFunc)
+    private string executeInstruction;
+    private string nitroxAssemblyName;
+
+    public NitroxEntryPatch(Func<string> subnauticaBasePathFunc, bool isBelowZero)
     {
         this.subnauticaBasePathFunc = subnauticaBasePathFunc;
+        if (isBelowZero) {
+            nitroxAssemblyName = "NitroxPatcher-BelowZero.dll";
+            executeInstruction = "System.Void NitroxPatcher_BelowZero.Main::Execute()";
+        } else {
+            nitroxAssemblyName = "NitroxPatcher-Subnautica.dll";
+            executeInstruction = "System.Void NitroxPatcher_Subnautica.Main::Execute()";
+        }
     }
 
     public void Apply()
     {
         string assemblyCSharp = Path.Combine(subnauticaManagedPath, GAME_ASSEMBLY_NAME);
-        string nitroxPatcherPath = Path.Combine(subnauticaManagedPath, NITROX_ASSEMBLY_NAME);
+        string nitroxPatcherPath = Path.Combine(subnauticaManagedPath, nitroxAssemblyName);
         string modifiedAssemblyCSharp = Path.Combine(subnauticaManagedPath, GAME_ASSEMBLY_MODIFIED_NAME);
 
         if (File.Exists(modifiedAssemblyCSharp))
@@ -117,13 +124,13 @@ internal sealed class NitroxEntryPatch
         FileSystem.Instance.ReplaceFile(modifiedAssemblyCSharp, assemblyCSharp);
     }
 
-    private static int FindNitroxExecuteInstructionIndex(IList<Instruction> methodInstructions)
+    private int FindNitroxExecuteInstructionIndex(IList<Instruction> methodInstructions)
     {
         for (int instructionIndex = 0; instructionIndex < methodInstructions.Count; instructionIndex++)
         {
             string instruction = methodInstructions[instructionIndex].Operand?.ToString();
 
-            if (instruction == NITROX_EXECUTE_INSTRUCTION)
+            if (instruction == executeInstruction)
             {
                 return instructionIndex;
             }
@@ -141,7 +148,7 @@ internal sealed class NitroxEntryPatch
             TypeDef gameInputType = module.GetTypes().First(x => x.FullName == GAME_INPUT_TYPE_NAME);
             MethodDef awakeMethod = gameInputType.Methods.First(x => x.Name == GAME_INPUT_METHOD_NAME);
 
-            return awakeMethod.Body.Instructions.Any(instruction => instruction.Operand?.ToString() == NITROX_EXECUTE_INSTRUCTION);
+            return awakeMethod.Body.Instructions.Any(instruction => instruction.Operand?.ToString() == executeInstruction);
         }
     }
 }

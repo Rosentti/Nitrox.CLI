@@ -18,7 +18,8 @@ public static class GameStarting {
             string gamepath = "";
 
             string? preferred = GamePathUtil.GetPreferredGamePath(game);
-
+            bool isBelowZero = game.Name == "SubnauticaZero";
+            
             if (!string.IsNullOrEmpty(preferred)) {
                 gamepath = preferred;
                 if (game.Name == "SubnauticaZero") {
@@ -54,7 +55,13 @@ public static class GameStarting {
 #endif
 
             // TODO: The launcher should override FileRead win32 API for the Subnautica process to give it the modified Assembly-CSharp from memory 
-            string initDllName = "NitroxPatcher.dll";
+            string initDllName;
+            if (isBelowZero) {
+                initDllName = "NitroxPatcher-BelowZero.dll";
+            } else {
+                initDllName = "NitroxPatcher-Subnautica.dll";
+            }
+
             try
             {
                 File.Copy(
@@ -75,7 +82,7 @@ public static class GameStarting {
                 {
                     nitroxEntryPatch.Remove();
                 }
-                nitroxEntryPatch = new NitroxEntryPatch(() => Path.Combine(gamepath, $"{game.Name}_Data"));
+                nitroxEntryPatch = new NitroxEntryPatch(() => Path.Combine(gamepath, $"{game.Name}_Data"), isBelowZero);
 
             if (nitroxEntryPatch == null)
             {

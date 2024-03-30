@@ -25,7 +25,7 @@
 
   <Target Name="BuildSubnautica" AfterTargets="Build" Condition="$(BuildSubnautica)==True">
       <ItemGroup>
-          <ProjectToBuildSN Include="..\NitroxPatcher\NitroxPatcher.csproj">
+          <ProjectToBuildSN Include="..\NitroxPatcher-Subnautica\NitroxPatcher-Subnautica.csproj">
               
           </ProjectToBuildSN>
           <ProjectToBuildSN Include="..\NitroxModel\NitroxModel.csproj">
@@ -34,7 +34,7 @@
           <ProjectToBuildSN Include="..\NitroxModel-Subnautica\NitroxModel-Subnautica.csproj">
               
           </ProjectToBuildSN>
-          <ProjectToBuildSN Include="..\NitroxClient\NitroxClient.csproj">
+          <ProjectToBuildSN Include="..\NitroxClient-Subnautica\NitroxClient-Subnautica.csproj">
               
           </ProjectToBuildSN>
       </ItemGroup>
