@@ -10,6 +10,7 @@
     <!-- These should be set by the user, depending on what you want to build -->
     <!-- TODO: move into a config or test by BuildTool output -->
     <BuildSubnautica>True</BuildSubnautica>
+    <BuildBelowZero>True</BuildBelowZero>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +22,7 @@
     <ProjectReference Include="..\NitroxModel\NitroxModel.csproj" />
     <ProjectReference Include="..\NitroxServer\NitroxServer.csproj" />
     <ProjectReference Condition="$(BuildSubnautica)==true" Include="..\NitroxServer-Subnautica\NitroxServer-Subnautica.csproj" />
+    <ProjectReference Condition="$(BuildBelowZero)==true" Include="..\NitroxServer-BelowZero\NitroxServer-BelowZero.csproj" />
   </ItemGroup>
 
   <Target Name="BuildSubnautica" AfterTargets="Build" Condition="$(BuildSubnautica)==True">
@@ -64,6 +66,50 @@
         <Copy SourceFiles="@(NitroxSubnauticaStaticDlls)" DestinationFolder="$(TargetDir)\lib\%(RecursiveDir)" />
         <Copy SourceFiles="@(NitroxSubnauticaLanguageFiles)" DestinationFolder="$(TargetDir)\LanguageFiles\%(RecursiveDir)" />
         <Copy SourceFiles="@(NitroxSubnauticaResources)" DestinationFolder="$(TargetDir)\Resources\%(RecursiveDir)" />
+      
+  </Target>
+
+  <Target Name="BuildBelowZero" AfterTargets="Build" Condition="$(BuildBelowZero)==True">
+      <ItemGroup>
+          <ProjectToBuildBZ Include="..\NitroxPatcher-BelowZero\NitroxPatcher-BelowZero.csproj">
+              
+          </ProjectToBuildBZ>
+          <ProjectToBuildBZ Include="..\NitroxModel\NitroxModel.csproj">
+              
+          </ProjectToBuildBZ>
+          <ProjectToBuildBZ Include="..\NitroxModel-BelowZero\NitroxModel-BelowZero.csproj">
+              
+          </ProjectToBuildBZ>
+          <ProjectToBuildBZ Include="..\NitroxClient-BelowZero\NitroxClient-BelowZero.csproj">
+              
+          </ProjectToBuildBZ>
+      </ItemGroup>
+      
+      <!-- Builds the Nitrox Clientside libraries for Below Zero -->
+      <!-- OutputPath | Sets the output path to lib -->
+      <!-- SatelliteResourceLanguages | Gets rid of useless localization folders in lib -->
+      <MSBuild
+          Projects="@(ProjectToBuildBZ)"
+          Targets="Restore;Build"
+          Properties="OutputPath=$(TargetDir)\lib;SatelliteResourceLanguages=en;TargetFramework=net472;GameReference=BelowZero">
+      </MSBuild>
+      
+      <ItemGroup>
+            <NitroxBelowZeroAssets Include="..\Nitrox.Assets.BelowZero\**\*." />
+        </ItemGroup>
+        <ItemGroup>
+            <NitroxBelowZeroStaticDlls Include="..\Nitrox.Assets.BelowZero\**\*.dll" />
+        </ItemGroup>
+        <ItemGroup>
+            <NitroxBelowZeroLanguageFiles Include="..\Nitrox.Assets.BelowZero\LanguageFiles\*.json" />
+        </ItemGroup>
+        <ItemGroup>
+            <NitroxBelowZeroResources Include="..\Nitrox.Assets.BelowZero\Resources\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(NitroxBelowZeroAssets)" DestinationFolder="$(TargetDir)\%(RecursiveDir)" />
+        <Copy SourceFiles="@(NitroxBelowZeroStaticDlls)" DestinationFolder="$(TargetDir)\lib\%(RecursiveDir)" />
+        <Copy SourceFiles="@(NitroxBelowZeroLanguageFiles)" DestinationFolder="$(TargetDir)\LanguageFiles\%(RecursiveDir)" />
+        <Copy SourceFiles="@(NitroxBelowZeroResources)" DestinationFolder="$(TargetDir)\Resources\%(RecursiveDir)" />
       
   </Target>
 

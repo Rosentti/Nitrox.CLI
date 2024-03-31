@@ -77,12 +77,13 @@ public static class GameStarting {
                 Console.ResetColor();
             }
 
+            nitroxEntryPatch = new NitroxEntryPatch(() => Path.Combine(gamepath, $"{game.Name}_Data"), isBelowZero);
+            
             // Try inject Nitrox into Subnautica code.
             if (nitroxEntryPatch?.IsApplied == true)
-                {
-                    nitroxEntryPatch.Remove();
-                }
-                nitroxEntryPatch = new NitroxEntryPatch(() => Path.Combine(gamepath, $"{game.Name}_Data"), isBelowZero);
+            {
+                nitroxEntryPatch.Remove();
+            }
 
             if (nitroxEntryPatch == null)
             {

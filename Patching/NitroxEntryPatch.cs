@@ -45,6 +45,8 @@ internal sealed class NitroxEntryPatch
         string assemblyCSharp = Path.Combine(subnauticaManagedPath, GAME_ASSEMBLY_NAME);
         string nitroxPatcherPath = Path.Combine(subnauticaManagedPath, nitroxAssemblyName);
         string modifiedAssemblyCSharp = Path.Combine(subnauticaManagedPath, GAME_ASSEMBLY_MODIFIED_NAME);
+        Console.WriteLine("Loading " + nitroxPatcherPath + " as NitroxPatcher");
+        Console.WriteLine("Loading " + modifiedAssemblyCSharp + " as " + GAME_ASSEMBLY_MODIFIED_NAME);
 
         if (File.Exists(modifiedAssemblyCSharp))
         {
